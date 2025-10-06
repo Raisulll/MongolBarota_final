@@ -1,10 +1,23 @@
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, ExternalLink, FlaskConical, MapPin, Navigation, Target, Trophy, Users, Wrench } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Calendar,
+  ExternalLink,
+  FlaskConical,
+  MapPin,
+  Navigation,
+  Target,
+  Trophy,
+  Users,
+  Wrench,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 
 const competitions = [
   {
@@ -87,7 +100,7 @@ const competitions = [
     description:
       "A prestigious European rover competition that tests teams' engineering skills through challenging missions in a Mars-analog environment.",
     website: "https://www.anatolianrover.space/",
-    image: "/placeholder.svg?height=300&width=500&text=ARC+Competition",
+    image: "/arc.jpeg",
     missions: [
       {
         name: "Science Mission",
@@ -182,7 +195,136 @@ const competitions = [
   },
 ];
 
+function CompetitionContent({
+  competition,
+}: {
+  competition: (typeof competitions)[0];
+}) {
+  return (
+    <div className="space-y-12">
+      {/* Competition Overview */}
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              {competition.name}
+            </h2>
+            <p className="text-lg text-muted-foreground mb-6">
+              {competition.description}
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 text-primary" />
+              <span className="font-medium">Organizer:</span>
+              <span className="text-muted-foreground">
+                {competition.organizer}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <MapPin className="w-5 h-5 text-primary" />
+              <span className="font-medium">Location:</span>
+              <span className="text-muted-foreground">
+                {competition.location}
+              </span>
+            </div>
+          </div>
+
+          <Button asChild variant="outline">
+            <Link
+              href={competition.website}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Official Website
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="relative">
+          <Image
+            src={competition.image || "/placeholder.svg"}
+            alt={competition.name}
+            width={500}
+            height={300}
+            className="rounded-lg shadow-lg"
+          />
+        </div>
+      </div>
+
+      {/* Missions */}
+      <div>
+        <h3 className="text-2xl font-bold mb-8 text-center">
+          Competition Missions
+        </h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          {competition.missions.map((mission, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <mission.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{mission.name}</h4>
+                    <Badge variant="secondary" className="text-xs">
+                      {mission.points}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  {mission.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Our History */}
+      <div>
+        <h3 className="text-2xl font-bold mb-8 text-center">
+          Our Performance History
+        </h3>
+        <div className="max-w-3xl mx-auto">
+          <div className="space-y-4">
+            {competition.ourHistory.map((entry, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
+                        <div className="text-sm font-medium">{entry.year}</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-lg">
+                          {entry.result}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {entry.score}
+                        </div>
+                      </div>
+                    </div>
+                    <Badge variant="outline">{entry.note}</Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CompetitionsPage() {
+  const [selectedCompetition, setSelectedCompetition] = useState("urc");
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -197,10 +339,15 @@ export default function CompetitionsPage() {
               <span className="text-primary block">Global Stage</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 text-pretty">
-              From Utah's Mars Desert to Turkey's challenging terrain, we test our rovers against the world's best teams
-              in prestigious international competitions.
+              From Utah's Mars Desert to Turkey's challenging terrain, we test
+              our rovers against the world's best teams in prestigious
+              international competitions.
             </p>
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary hover:bg-primary/90"
+            >
               <Link href="/achievements">
                 View Our Results
                 <Trophy className="ml-2 h-4 w-4" />
@@ -210,115 +357,52 @@ export default function CompetitionsPage() {
         </div>
       </section>
 
-      {/* Competition Tabs */}
+      {/* Competition Tabs/Dropdown */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <Tabs defaultValue="urc" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-12">
-              <TabsTrigger value="urc">University Rover Challenge</TabsTrigger>
-              <TabsTrigger value="arc">Anatolian Rover Challenge</TabsTrigger>
-              <TabsTrigger value="erc">European Rover Challenge</TabsTrigger>
-            </TabsList>
+          {/* Mobile Dropdown */}
+          <div className="md:hidden mb-8">
+            <select
+              value={selectedCompetition}
+              onChange={(e) => setSelectedCompetition(e.target.value)}
+              className="w-full p-3 border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="urc">University Rover Challenge</option>
+              <option value="arc">Anatolian Rover Challenge</option>
+              <option value="erc">European Rover Challenge</option>
+            </select>
+          </div>
 
-            {competitions.map((competition) => (
-              <TabsContent key={competition.id} value={competition.id} className="space-y-12">
-                {/* Competition Overview */}
-                <div className="grid lg:grid-cols-2 gap-12 items-center">
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-3xl md:text-4xl font-bold mb-4">{competition.name}</h2>
-                      <p className="text-lg text-muted-foreground mb-6">{competition.description}</p>
-                    </div>
+          {/* Desktop Tabs */}
+          <div className="hidden md:block">
+            <Tabs defaultValue="urc" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-12">
+                <TabsTrigger value="urc">
+                  University Rover Challenge
+                </TabsTrigger>
+                <TabsTrigger value="arc">Anatolian Rover Challenge</TabsTrigger>
+                <TabsTrigger value="erc">European Rover Challenge</TabsTrigger>
+              </TabsList>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <Users className="w-5 h-5 text-primary" />
-                        <span className="font-medium">Organizer:</span>
-                        <span className="text-muted-foreground">{competition.organizer}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <MapPin className="w-5 h-5 text-primary" />
-                        <span className="font-medium">Location:</span>
-                        <span className="text-muted-foreground">{competition.location}</span>
-                      </div>
-                    </div>
+              {competitions.map((competition) => (
+                <TabsContent key={competition.id} value={competition.id}>
+                  <CompetitionContent competition={competition} />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
 
-                    <Button asChild variant="outline">
-                      <Link href={competition.website} target="_blank" rel="noopener noreferrer">
-                        Official Website
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+          {/* Mobile Content */}
+          <div className="md:hidden">
+            {competitions.map(
+              (competition) =>
+                selectedCompetition === competition.id && (
+                  <div key={competition.id}>
+                    <CompetitionContent competition={competition} />
                   </div>
-
-                  <div className="relative">
-                    <Image
-                      src={competition.image || "/placeholder.svg"}
-                      alt={competition.name}
-                      width={500}
-                      height={300}
-                      className="rounded-lg shadow-lg"
-                    />
-                  </div>
-                </div>
-
-                {/* Missions */}
-                <div>
-                  <h3 className="text-2xl font-bold mb-8 text-center">Competition Missions</h3>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {competition.missions.map((mission, index) => (
-                      <Card key={index} className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                              <mission.icon className="w-5 h-5 text-primary" />
-                            </div>
-                            <div>
-                              <h4 className="font-semibold">{mission.name}</h4>
-                              <Badge variant="secondary" className="text-xs">
-                                {mission.points}
-                              </Badge>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-muted-foreground text-sm">{mission.description}</p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Our History */}
-                <div>
-                  <h3 className="text-2xl font-bold mb-8 text-center">Our Performance History</h3>
-                  <div className="max-w-3xl mx-auto">
-                    <div className="space-y-4">
-                      {competition.ourHistory.map((entry, index) => (
-                        <Card key={index} className="hover:shadow-lg transition-shadow">
-                          <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="text-center">
-                                  <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
-                                  <div className="text-sm font-medium">{entry.year}</div>
-                                </div>
-                                <div>
-                                  <div className="font-semibold text-lg">{entry.result}</div>
-                                  <div className="text-sm text-muted-foreground">{entry.score}</div>
-                                </div>
-                              </div>
-                              <Badge variant="outline">{entry.note}</Badge>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+                )
+            )}
+          </div>
         </div>
       </section>
 
@@ -326,7 +410,9 @@ export default function CompetitionsPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Competition Statistics</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Competition Statistics
+            </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
               Our track record across international Mars rover competitions
             </p>
@@ -336,30 +422,40 @@ export default function CompetitionsPage() {
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">8+</div>
-                <div className="text-sm text-muted-foreground">Total Competitions</div>
+                <div className="text-sm text-muted-foreground">
+                  Total Competitions
+                </div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">1</div>
-                <div className="text-sm text-muted-foreground">Global Championship</div>
+                <div className="text-sm text-muted-foreground">
+                  Global Championship
+                </div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
                 <div className="text-3xl font-bold text-primary mb-2">3</div>
-                <div className="text-sm text-muted-foreground">Podium Finishes</div>
+                <div className="text-sm text-muted-foreground">
+                  Podium Finishes
+                </div>
               </CardContent>
             </Card>
             <Card className="text-center">
               <CardContent className="p-6">
-                <div className="text-3xl font-bold text-primary mb-2">90.15%</div>
-                <div className="text-sm text-muted-foreground">Highest SAR Score</div>
+                <div className="text-3xl font-bold text-primary mb-2">
+                  90.15%
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Highest SAR Score
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -430,10 +430,10 @@ const subTeams = [
         image: "/Team/Mgt/abid_ikram.jpg",
       },
       {
-        name: "Rahid Mohammad",
+        name: "Rahik Mohammad",
         role: "Team Member",
         department: "Industrial & Production Engineering",
-        image: "/Team/Mgt/rahid_mohammad.jpg",
+        image: "/Team/Mgt/rahik_mohammad.jpg",
       },
     ],
   },
